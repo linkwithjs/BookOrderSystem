@@ -36,16 +36,15 @@ public class Order {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToMany
-    @JoinTable(
-            name = "order_book",
-            joinColumns = @JoinColumn(name = "order_id"),
-            inverseJoinColumns = @JoinColumn(name = "book_id")
-    )
+
+    @ManyToOne
+    @JoinColumn(name = "book_id")
+    private Book book;
 
     private List<Book> books;
     public enum StatusEnum {
         ACCEPT,
+        PENDING,
         DECLINE
     }
 }
