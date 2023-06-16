@@ -36,11 +36,8 @@ public class Order {
     @JoinColumn(name = "user_id")
     private User user;
 
-
-    @ManyToOne
+    @ManyToMany
     @JoinColumn(name = "book_id")
-    private Book book;
-
     private List<Book> books;
     public enum StatusEnum {
         ACCEPT,

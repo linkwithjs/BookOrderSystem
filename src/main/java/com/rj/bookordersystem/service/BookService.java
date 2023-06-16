@@ -1,18 +1,25 @@
 package com.rj.bookordersystem.service;
 
+import com.rj.bookordersystem.exceptions.CustomException;
 import com.rj.bookordersystem.models.Book;
 import com.rj.bookordersystem.models.User;
 import com.rj.bookordersystem.repository.BookRepository;
+import com.rj.bookordersystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BookService {
     @Autowired
     private BookRepository bookRepo;
+
+    @Autowired
+    private UserRepository userRepository;
 
     // get all books
     public List<Book> getAllBooks() {
@@ -38,7 +45,7 @@ public class BookService {
         newBook.setPrice(b.getPrice());
         newBook.setPublisher(b.getPublisher());
         newBook.setQuantity(b.getQuantity());
-        newBook.setUser(getAuthenticatedUser());
+        newBook.setUser(getAuthenticatedUser().get());
         return bookRepo.save(newBook);
     }
 
@@ -61,10 +68,15 @@ public class BookService {
         return result;
     }
 
-    public User getAuthenticatedUser() {
+    public Optional<User> getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
-        return user;
+        Object principal = authentication.getPrincipal();
+        String username = "";
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails) principal).getUsername();
+        }
+        String finalUsername = username;
+        return Optional.ofNullable(userRepository.findByUsername(username).orElseThrow(() -> new CustomException("Error: " + finalUsername + " is not found.")));
     }
 
 }

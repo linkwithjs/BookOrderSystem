@@ -43,7 +43,4 @@ public class User {
         this.password = password;
     }
 
-    @OneToMany(mappedBy = "user")
-    private List<Order> orders;
-
 }
