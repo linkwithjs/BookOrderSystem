@@ -2,6 +2,7 @@ package com.rj.bookordersystem.controller;
 
 import com.rj.bookordersystem.models.Book;
 import com.rj.bookordersystem.service.BookService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,7 @@ public class BookController {
     @GetMapping("/get-books")
     public ResponseEntity<List<Book>> getBooks() {
         List<Book> list = bookService.getAllBooks();
+
         if (list.size() <= 0) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } else
@@ -40,19 +42,12 @@ public class BookController {
     // Fetch Single book
     @GetMapping("/books/{id}")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
-    public ResponseEntity<Book> getBook(@PathVariable("id") int id) {
-        Book book = bookService.getBookById(id);
-        if (book == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-        return ResponseEntity.of(Optional.of(book));
-    }
-
+    public Book getBook(@Valid @PathVariable("id") int id) {return bookService.getBookById(id);}
 
     // Delete a book
     @DeleteMapping("/books/{bookId}")
     @PreAuthorize("hasAuthority('SUPER_ADMIN') or hasAuthority('ADMIN')")
-    public ResponseEntity<Void> deleteBook(@PathVariable("bookId") int bookId) {
+    public ResponseEntity<Void> deleteBook(@Valid @PathVariable("bookId") int bookId) {
         try {
             // System.out.println("Book id : " + bookId);
             this.bookService.deleteBook(bookId);

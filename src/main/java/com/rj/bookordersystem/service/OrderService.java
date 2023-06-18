@@ -1,5 +1,8 @@
 package com.rj.bookordersystem.service;
 
+import com.rj.bookordersystem.dto.OrderDTO;
+import com.rj.bookordersystem.dto.OrderResponseDTO;
+import com.rj.bookordersystem.dto.ResponseDTO;
 import com.rj.bookordersystem.exceptions.CustomException;
 import com.rj.bookordersystem.models.Book;
 import com.rj.bookordersystem.models.Order;
@@ -8,10 +11,13 @@ import com.rj.bookordersystem.repository.BookRepository;
 import com.rj.bookordersystem.repository.OrderRepository;
 import com.rj.bookordersystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,15 +40,29 @@ public class OrderService {
     }
 
     // adding the order book
-    public Order addOrder(Order order) {
-        List<Book> booklist;
-        order.getBooks().stream().map(book -> {
-            System.out.println(book);
-            return null;
+    public ResponseEntity<?> addOrder(OrderDTO orderDTO) {
+        ArrayList<Book> books = new ArrayList<>();
+        Order order = new Order();
+        orderDTO.getBooks().forEach(book -> {
+            Book bookDetails = bookRepository.findById(book.getId());
+            books.add(bookDetails);
         });
+
+        order.setStatus(orderDTO.getStatus());
+        order.setDateAttribute(orderDTO.getDateAttribute());
+        order.setBooks(books);
         order.setUser(getAuthenticatedUser().get());
-        Order result = orderRepo.save(order);
-        return result;
+        Order savedOrder = orderRepo.save(order);
+
+        OrderResponseDTO orderResponseDTO = new OrderResponseDTO();
+        orderResponseDTO.setId(savedOrder.getId());
+        orderResponseDTO.setDateAttribute(savedOrder.getDateAttribute());
+        orderResponseDTO.setStatus(savedOrder.getStatus());
+        orderResponseDTO.setUser(getAuthenticatedUser().get().getUsername());
+        orderResponseDTO.setBooks(savedOrder.getBooks());
+
+
+        return ResponseDTO.successResponse("Order placed successfully", orderResponseDTO);
     }
 
     public Optional<User> getAuthenticatedUser() {

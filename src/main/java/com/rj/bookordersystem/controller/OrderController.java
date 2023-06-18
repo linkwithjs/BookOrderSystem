@@ -1,9 +1,11 @@
 package com.rj.bookordersystem.controller;
 
+import com.rj.bookordersystem.dto.OrderDTO;
 import com.rj.bookordersystem.dto.ResponseDTO;
 import com.rj.bookordersystem.models.Book;
 import com.rj.bookordersystem.models.Order;
 import com.rj.bookordersystem.service.OrderService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,15 +36,8 @@ public class OrderController {
 
     @PostMapping("/add-order")
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<Order> addOrder(@RequestBody Order order) {
-        Order b = null;
-        try {
-            b = this.orderService.addOrder(order);
-            return ResponseEntity.of(Optional.of(b));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    public ResponseEntity<?> addOrder(@Valid @RequestBody OrderDTO order) {
+        return orderService.addOrder(order);
     }
 
 }
