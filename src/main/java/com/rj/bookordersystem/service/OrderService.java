@@ -61,7 +61,6 @@ public class OrderService {
         orderResponseDTO.setUser(getAuthenticatedUser().get().getUsername());
         orderResponseDTO.setBooks(savedOrder.getBooks());
 
-
         return ResponseDTO.successResponse("Order placed successfully", orderResponseDTO);
     }
 

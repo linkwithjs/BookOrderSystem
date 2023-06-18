@@ -1,11 +1,14 @@
 package com.rj.bookordersystem.service;
 
+import com.rj.bookordersystem.dto.ResponseDTO;
 import com.rj.bookordersystem.exceptions.CustomException;
 import com.rj.bookordersystem.models.Book;
 import com.rj.bookordersystem.models.User;
 import com.rj.bookordersystem.repository.BookRepository;
 import com.rj.bookordersystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -50,8 +53,14 @@ public class BookService {
     }
 
 // Delete a book
-    public void deleteBook(int bid) {
-        bookRepo.deleteById(bid);
+    public ResponseEntity<?> deleteBook(int bid) {
+        Book book = bookRepo.findById(bid);
+        if(book!=null){
+            bookRepo.deleteById(bid);
+            return ResponseDTO.successResponse("Book Deleted Successfully!");
+        }else{
+            throw new CustomException("Error: Book not found for this id : " + bid);
+        }
     }
 
     // Update book
