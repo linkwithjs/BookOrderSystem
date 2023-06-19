@@ -7,7 +7,6 @@ import com.rj.bookordersystem.models.User;
 import com.rj.bookordersystem.repository.BookRepository;
 import com.rj.bookordersystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,15 +29,20 @@ public class BookService {
         return list;
     }
 
+    // get all available books
+    public List<Book> getAllAvailableBooks() {
+        List<Book> list = (List<Book>) this.bookRepo.findBooksByQuantityGreaterThanZero();
+        return list;
+    }
+
     // get single book by id
-    public Book getBookById(int id) {
-        Book book = null;
-        try {
-            book = this.bookRepo.findById(id);
-        } catch (Exception e) {
-            e.printStackTrace();
+    public ResponseEntity<?> getBookById(int id) {
+        Book book = bookRepo.findById(id);
+        if(book!=null){
+            return ResponseDTO.successResponse("",book);
+        }else{
+            return ResponseDTO.successResponse("Book with id: "+id+" not found.");
         }
-        return book;
     }
 
     // adding the book
@@ -64,17 +68,15 @@ public class BookService {
     }
 
     // Update book
-    public Book updateBook(Book book, int bookId) {
+    public ResponseEntity<?> updateBook(Book book, int bookId) {
         Book result = bookRepo.findById(bookId);
-        try {
-            if (result != null) {
-                book.setId(bookId);
-                bookRepo.save(book);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(result !=null){
+            book.setId(bookId);
+            bookRepo.save(book);
+            return ResponseDTO.successResponse("Book Updated Successfully.",result);
+        }else{
+            return ResponseDTO.successResponse("Book Couldn't be updated!");
         }
-        return result;
     }
 
     public Optional<User> getAuthenticatedUser() {

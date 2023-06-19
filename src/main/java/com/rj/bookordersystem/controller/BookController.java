@@ -30,6 +30,14 @@ public class BookController {
         return ResponseDTO.successResponse("", list);
     }
 
+    //Get All Available Books
+    @GetMapping("/books/available")
+    @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
+    public ResponseEntity<?> getAvailableBook() {
+        List<Book> list = bookService.getAllAvailableBooks();
+        return ResponseDTO.successResponse("",list);
+    }
+
     @PostMapping("/add-book")
     @PreAuthorize("hasAuthority('USER')")
     public Book  addBook(@RequestBody Book book) {return bookService.add(book);}
@@ -37,7 +45,7 @@ public class BookController {
     // Fetch Single book
     @GetMapping("/books/{id}")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
-    public Book getBook(@Valid @PathVariable("id") int id) {return bookService.getBookById(id);}
+    public ResponseEntity<?> getBook(@Valid @PathVariable("id") int id) {return bookService.getBookById(id);}
 
     // Delete a book
     @DeleteMapping("/books/{bookId}")
@@ -47,18 +55,6 @@ public class BookController {
     // Update Book
     @PutMapping("/books/{bookId}")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
-    public ResponseEntity<Book> updateBook(@Valid @RequestBody Book book, @PathVariable("bookId") int bookId) {
-        try {
-            Book result = bookService.updateBook(book, bookId);
-            if (result == null) {
-                return ResponseEntity.notFound().build();
-            } else {
-                return ResponseEntity.ok().body(result);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
+    public ResponseEntity<?> updateBook(@Valid @RequestBody Book book, @PathVariable("bookId") int bookId) {return bookService.updateBook(book, bookId);}
 
 }
