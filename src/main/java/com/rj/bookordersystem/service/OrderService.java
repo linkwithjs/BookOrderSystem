@@ -25,16 +25,20 @@ import java.util.Optional;
 public class OrderService {
     @Autowired
     private OrderRepository orderRepo;
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private BookRepository bookRepository;
 
     // get all orders
     public List<Order> getAllOrders() {
         List<Order> list = (List<Order>) this.orderRepo.findAll();
+        return list;
+    }
+
+    //get all pending orders
+    public List<Order> getPendingOrders(){
+        List<Order> list = (List<Order>) this.orderRepo.pendingOrders();
         return list;
     }
 
